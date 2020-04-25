@@ -2,13 +2,17 @@ package com.example.anagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import com.google.android.material.snackbar.Snackbar;
 import android.os.Bundle;
+import android.util.Log;
+
 import android.view.View;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +20,6 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
     TextView tv_info;
     TextView tv_word;
     TextView score;
@@ -292,87 +295,31 @@ public class MainActivity extends AppCompatActivity {
             "Zyra"
     };
 
+    /* Logic for a new game of an anagram is that upon start, the user does not have access to
+     * the next champion. They must solve the anagram to unlock a new anagram. However,
+     * I believe that it would be more user friendly to have it disabled for each question,
+     * and after the user asks for a hint, we can reduce half a point from the 1 point they
+     * would have received from getting it correct. After the hint, they can then choose to
+     * click on a new anagram.
+     *
+     * Currently, I have it setup to create a new anagram after the user solves an anagram. I
+     * will begin implementing a "disable affordance" on top of the b_new button when disbaled,
+     * to notify users that they can either get a hint, or solve it.
+     *
+     * Disabled affordance is simply placing an active button on top of the disabled button, so
+     * that when the user clicks on the "disabled button", they are really clicking on the
+     * enabled button that will prompt instructions. */
 
+    /* New concept, each solved anagram is a new hint. OnCreate, you have 3 hints. Use them all up and they're gone. Previous rules apply when numHintsLeft = 0 */
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        tv_info = (TextView) findViewById(R.id.tv_info);
-        tv_word = (TextView) findViewById(R.id.tv_word);
-
-        et_guess = (EditText) findViewById(R.id.et_guess);
-
-        b_check = (Button) findViewById(R.id.b_check);
-        b_new = (Button) findViewById(R.id.b_new);
-        b_hint = (Button) findViewById(R.id.b_hint);
-
-        score = (TextView) findViewById(R.id.score);
-
-        r = new Random();
-
-        newGame();
-        hintHelp();
-
-        b_check.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               if(et_guess.getText().toString().equalsIgnoreCase(currentWord)){
-                   tv_info.setText("Awesome");
-                   b_check.setEnabled(false);
-                   b_new.setEnabled(true);
-                   realScore++;
-                   score.setText("Score is: " + realScore);
-               } else {
-                   tv_info.setText("Git Gud");
-                   realScore--;
-                   score.setText("Score is: " + realScore);
-               }
-            }
-        });
-
-        b_new.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                newGame();
-
-            }
-        });
-
-        b_hint.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                hintHelp();
-                tv_info.setText(hintText);
-            }
-        });
-    }
-
-
-    public String readFile(String file){
-        String text = "";
-
-
-
-    }
-
-
-
-    //shuffle algorithm
-    private String shuffledWord(String word){
-        List<String> letters = Arrays.asList(word.split(""));
-        Collections.shuffle(letters);
-        String shuffled = "";
-        for(String letter : letters){
-            shuffled += letter;
-
+    private void newGame() {      b_new.setOnClickListener(new View.OnClickListener(){
+        @Override
+        public void onClick(View v){
+            newGame();
+            Log.d("Mainactivity", "New Anagram Clicked");
         }
-        return shuffled;
-    }
+    });
 
-    private void newGame() {
         //get random word from the dictionary
         a = r.nextInt(dictionary.length);
         currentWord = dictionary[a];
@@ -383,18 +330,101 @@ public class MainActivity extends AppCompatActivity {
         //clear the text field
         et_guess.setText("");
 
-
         //switch buttons
         b_new.setEnabled(false);
         b_check.setEnabled(true);
+        Log.d("Mainactivity", "New game initiated");
+    }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tv_info = findViewById(R.id.tv_info);
+        tv_word = findViewById(R.id.tv_word);
+
+        et_guess = findViewById(R.id.et_guess);
+
+        b_check = findViewById(R.id.b_check);
+        b_new = findViewById(R.id.b_new);
+        b_hint = findViewById(R.id.b_hint);
+
+        score = findViewById(R.id.score);
+        r = new Random();
+
+        // Initiate a new game to disable new_b and populate tv_word
+        newGame();
+        hintHelp();
+
+        b_new.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(b_new.isActivated()){
+                    Log.d("Mainactivity", "User tried to click on new anagram game while not available");
+                } else {
+                    Log.d("Mainactivity", "User tried to click on new anagram game while not available");
+                }
+                newGame();
+                Log.d("Mainactivity", "New Anagram Clicked");
+            }
+        });
+
+
+        b_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(et_guess.getText().toString().isEmpty()){
+                    Log.d("Mainactivity", "empty text box, do not decrease the number");
+                    /* Catches when the user attempts to check to see if their guess is correct
+                    * but the text field is still completely empty */
+                    Toast.makeText(getApplicationContext(), "Text box is empty!", Toast.LENGTH_SHORT).show();
+                } else if (et_guess.getText().toString().equalsIgnoreCase(currentWord)){
+//                   tv_info.setText("Awesome");
+                   Snackbar.make(findViewById(R.id.tv_info),"Cracked the Anagram!", Snackbar.LENGTH_SHORT).show();
+                   b_check.setEnabled(false);
+                   b_new.setEnabled(true);
+                   realScore++;
+                   score.setText("Score is: " + realScore);
+                    newGame();
+               } else {
+                   tv_info.setText("Git Gud");
+                   realScore--;
+                   score.setText("Score is: " + realScore);
+               }
+            }
+        });
+
+
+        /* b_hint populates tv_info with a hint */
+        b_hint.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                hintHelp();
+                tv_info.setText(hintText);
+                Log.d("Mainactivity", "Help Hint Clicked");
+            }
+        });
+    }
+
+
+    public void readFile(String file){
+        String text = "";
+    }
+
+
+    /* Shuffles a given champion's name and converts it into an anagram */
+    private String shuffledWord(String word){
+        List<String> letters = Arrays.asList(word.split(""));
+        Collections.shuffle(letters);
+        String shuffled = "";
+        for(String letter : letters){
+            shuffled += letter;
+        }
+        return shuffled;
     }
 
     private void hintHelp(){
         hintText = hintFile[a];
-
-
     }
-
-
 }

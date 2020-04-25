@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Anagram</string>
+    <string name="emptyText">The textbox is empty!</string>
 </resources>
