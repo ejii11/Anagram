@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="10dp"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Guess the LoL Champion Name" />
+
+    <TextView
+        android:id="@+id/tv_word"
+        android:layout_marginTop="20dp"
+        android:textSize="26dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_info"
+        android:layout_centerHorizontal="true"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/score"
+        android:layout_marginTop="20dp"
+        android:textSize="26dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/b_check"
+        android:layout_centerHorizontal="true"
+        android:text="Score: " />
+
+    <EditText
+        android:id="@+id/et_guess"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_word"
+        android:layout_centerHorizontal="true"
+
+        android:inputType="textPersonName"
+        android:hint="Word"
+        android:text="" />
+
+    <Button
+        android:id="@+id/b_check"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_guess"
+        android:layout_centerHorizontal="true"
+        android:text="CHECK" />
+
+    <Button
+        android:id="@+id/b_hint"
+        android:layout_marginTop="45dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/score"
+        android:layout_centerHorizontal="true"
+        android:text="Hint?" />
+
+    <Button
+        android:id="@+id/b_new"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:text="I want a new word!" />
+</RelativeLayout>
