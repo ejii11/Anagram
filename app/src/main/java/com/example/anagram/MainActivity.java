@@ -2,18 +2,34 @@ package com.example.anagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
+import com.example.anagram.R;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,12 +45,16 @@ public class MainActivity extends AppCompatActivity {
     Button b_check;
     Button b_new;
     Button b_hint;
+    Button b_dict;
 
     Random r;
 
     String currentWord;
-
     String hintText;
+
+    Word[] word = new Word[1000000];
+
+    int index = 0;
 
     String[] hintFile = {
             "The Darkin Blade",
@@ -293,8 +313,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -302,34 +320,51 @@ public class MainActivity extends AppCompatActivity {
 
         tv_info = (TextView) findViewById(R.id.tv_info);
         tv_word = (TextView) findViewById(R.id.tv_word);
+        score = (TextView) findViewById(R.id.score);
 
         et_guess = (EditText) findViewById(R.id.et_guess);
 
         b_check = (Button) findViewById(R.id.b_check);
         b_new = (Button) findViewById(R.id.b_new);
         b_hint = (Button) findViewById(R.id.b_hint);
-
-        score = (TextView) findViewById(R.id.score);
+        b_dict = (Button) findViewById(R.id.b_dict);
 
         r = new Random();
 
+        readFile();
         newGame();
         hintHelp();
+
+        b_dict.setEnabled(true);
+
+        Button b_dict = (Button) findViewById(R.id.b_dict);
+        b_dict.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String link = "https://www.dictionary.com/";
+                Uri webaddress = Uri.parse(link);
+
+                Intent goToLink = new Intent(Intent.ACTION_VIEW, webaddress);
+                if(goToLink.resolveActivity(getPackageManager()) != null){
+                    startActivity(goToLink);
+                }
+            }
+        });
 
         b_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               if(et_guess.getText().toString().equalsIgnoreCase(currentWord)){
-                   tv_info.setText("Awesome");
-                   b_check.setEnabled(false);
-                   b_new.setEnabled(true);
-                   realScore++;
-                   score.setText("Score is: " + realScore);
-               } else {
-                   tv_info.setText("Git Gud");
-                   realScore--;
-                   score.setText("Score is: " + realScore);
-               }
+                if(et_guess.getText().toString().equalsIgnoreCase(currentWord)){
+                    tv_info.setText("Awesome");
+                    b_check.setEnabled(false);
+                    b_new.setEnabled(true);
+                    realScore++;
+                    score.setText("Score is: " + realScore);
+                } else {
+                    tv_info.setText("Git Gud. Try Again");
+                    realScore--;
+                    score.setText("Score is: " + realScore);
+                }
             }
         });
 
@@ -351,15 +386,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public String readFile(String file){
-        String text = "";
-
-
-
-    }
-
-
-
     //shuffle algorithm
     private String shuffledWord(String word){
         List<String> letters = Arrays.asList(word.split(""));
@@ -374,8 +400,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void newGame() {
         //get random word from the dictionary
-        a = r.nextInt(dictionary.length);
-        currentWord = dictionary[a];
+        a = r.nextInt(index);//r.nextInt(word.length);
+        currentWord = word[a].getWord();
 
         //show the shuffled word
         tv_word.setText(shuffledWord(currentWord));
@@ -391,10 +417,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hintHelp(){
-        hintText = hintFile[a];
+        hintText = word[a].getDef();
 
 
     }
 
 
+
+
+    public void readFile(){
+
+        try{
+            InputStream is = getApplicationContext().getAssets().open("dictionary.txt");
+            InputStreamReader isr = new InputStreamReader(is, Charset.forName("UTF-8"));
+            BufferedReader br = new BufferedReader(isr);
+            Scanner sc = new Scanner (br);
+
+            while (sc.hasNextLine()){
+                String wordFromFile = sc.next();
+                String definition = sc.nextLine();
+
+                word[index++] = new Word(wordFromFile, definition);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public class Word {
+
+        private String word;
+        private String def;
+
+        public Word(String word, String def) {
+            this.word = word;
+            this.def = def;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        public void setWord(String word) {
+            this.word = word;
+        }
+
+        public String getDef() {
+            return def;
+        }
+
+        public void setDef(String def) {
+            this.def = def;
+        }
+
+        public int compareTo(String key) {
+            return word.compareTo(key);
+        }
+
+        public boolean equals(String key) {
+            return word.equals(key);
+        }
+
+        @Override
+        public String toString() {
+            return "Word [word=" + word + ", def=" + def + "]";
+        }
+
+    }
 }
