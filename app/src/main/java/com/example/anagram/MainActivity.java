@@ -14,6 +14,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -167,134 +173,33 @@ public class MainActivity extends AppCompatActivity {
             "Rise of Thorns"
     };
 
-    String[] dictionary = {
-            "Aatrox",
-            "Ahri",
-            "Akali",
-            "Alistar",
-            "Amumu",
-            "Anivia",
-            "Annie",
-            "Ashe",
-            "Azir",
-            "Blitzcrank",
-            "Brand",
-            "Braum",
-            "Caitlyn",
-            "Cassiopeia",
-            "Cho'Gath",
-            "Corki",
-            "Darius",
-            "Diana",
-            "Dr. Mundo",
-            "Draven",
-            "Elise",
-            "Evelynn",
-            "Ezreal",
-            "Fiddlesticks",
-            "Fiora",
-            "Fizz",
-            "Galio",
-            "Gangplank",
-            "Garen",
-            "Gnar",
-            "Gragas",
-            "Graves",
-            "Hecarim",
-            "Heimerdinger",
-            "Irelia",
-            "Janna",
-            "Jarvan IV",
-            "Jax",
-            "Jayce",
-            "Jinx",
-            "Kalista",
-            "Karma",
-            "Karthus",
-            "Kassadin",
-            "Katarina",
-            "Kayle",
-            "Kennen",
-            "Kha'Zix",
-            "Kog'Maw",
-            "LeBlanc",
-            "Lee Sin",
-            "Leona",
-            "Lissandra",
-            "Lucian",
-            "Lulu",
-            "Lux",
-            "Malphite",
-            "Malzahar",
-            "Maokai",
-            "Master Yi",
-            "Miss Fortune",
-            "Mordekaiser",
-            "Morgana",
-            "Nami",
-            "Nasus",
-            "Nautilus",
-            "Nidalee",
-            "Nocturne",
-            "Nunu",
-            "Olaf",
-            "Orianna",
-            "Pantheon",
-            "Poppy",
-            "Quinn",
-            "Rammus",
-            "Rek'Sai",
-            "Renekton",
-            "Rengar",
-            "Riven",
-            "Rumble",
-            "Ryze",
-            "Sejuani",
-            "Shaco",
-            "Shen",
-            "Shyvana",
-            "Singed",
-            "Sion",
-            "Sivir",
-            "Skarner",
-            "Sona",
-            "Soraka",
-            "Swain",
-            "Sylas",
-            "Syndra",
-            "Talon",
-            "Taric",
-            "Teemo",
-            "Thresh",
-            "Tristana",
-            "Trundle",
-            "Tryndamere",
-            "Twisted Fate",
-            "Twitch",
-            "Udyr",
-            "Urgot",
-            "Varus",
-            "Vayne",
-            "Veigar",
-            "Vel'Koz",
-            "Vi",
-            "Viktor",
-            "Vladimir",
-            "Volibear",
-            "Warwick",
-            "Wukong",
-            "Xerath",
-            "Xin Zhao",
-            "Yasuo",
-            "Yorick",
-            "Yuumi",
-            "Zac",
-            "Zed",
-            "Ziggs",
-            "Zilean",
-            "Zyra"
-    };
+    ArrayList<String> dictionary = new ArrayList<>();
 
+    public void readChampionFile() {
+        InputStream is = getResources().openRawResource(R.raw.champions);
+        BufferedReader reader = new BufferedReader(
+            new InputStreamReader(is, Charset.forName("UTF-8"))
+        );
+        String line = "";
+
+        try {
+            while ( (line = reader.readLine()) != null)){
+                // Split byt ','
+                String[] tokens = line.split(",");
+                // Read the data
+                dictionary champion = new dictionary();
+                champion.setA(tokensp[0]);
+                dictionary.add(champion);
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.wtf("MainAcitivty" + line,  e);
+
+        }
+
+
+    }
     /* Logic for a new game of an anagram is that upon start, the user does not have access to
      * the next champion. They must solve the anagram to unlock a new anagram. However,
      * I believe that it would be more user friendly to have it disabled for each question,
@@ -312,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
 
     /* New concept, each solved anagram is a new hint. OnCreate, you have 3 hints. Use them all up and they're gone. Previous rules apply when numHintsLeft = 0 */
 
-    private void newGame() {      b_new.setOnClickListener(new View.OnClickListener(){
+    private void newGame() {
+        b_new.setOnClickListener(new View.OnClickListener(){
         @Override
         public void onClick(View v){
             newGame();
